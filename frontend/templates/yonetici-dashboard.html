@@ -1,0 +1,89 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yönetici Paneli</title>
+
+    <!-- Tailwind CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+
+    <!-- DataTable CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <!-- font-awsome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
+    <!-- jQuery ve DataTable.js -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+    <!-- Yönetici Dashboard JS -->
+    <script defer src="{% static 'js/yonetici-dashboard.js' %}"></script>
+</head>
+<body class="bg-gray-100">
+
+    <!-- Navbar -->
+    <nav class="flex justify-between items-center p-3 md:py-10 bg-gray-200">
+        <h1 class="text-3xl font-semibold text-[#54BD95]">Yönetici Paneli</h1>
+        <ul class="flex gap-3 md:gap-10 items-center">
+            <p id="welcomeMessage"></p>
+            <a id="logout" href="" class="text-md p-1 rounded-md text-gray-500">Çıkış Yap</a>
+        </ul>
+    </nav>
+
+    <!-- Tabs -->
+    <div class="container mx-auto mt-8">
+        <ul class="flex border-b">
+            <li class="mr-1">
+                <a id="attendanceTab" class="p-2 rounded-full px-5 bg-white text-black border border-black  shadow-md cursor-pointer">Giriş-Çıkış</a>
+            </li>
+            <li class="mr-1">
+                <a id="leaveRequestsTab" class="p-2 rounded-full px-5 bg-white text-black border border-black  shadow-md cursor-pointer">İzin Talepleri</a>
+            </li>
+        </ul>
+
+        <!-- Tab İçerikleri -->
+        <div id="attendanceContent" class="mt-4">
+            <h2 class="text-2xl font-bold mb-4">Personel Giriş-Çıkış Tablosu</h2>
+            <table id="attendanceTable" class="min-w-full bg-white border border-gray-300">
+                <thead class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
+                    <tr>
+                        <th class="border px-4 py-2">Personel Adı</th>
+                        <th class="border px-4 py-2">Tarih</th>
+                        <th class="border px-4 py-2">Giriş Saati</th>
+                        <th class="border px-4 py-2">Çıkış Saati</th>
+                        <th class="border px-4 py-2">Ofiste Geçen Süre</th>
+                        <th class="border px-4 py-2">Geç Kalma Süresi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- DataTable.js burada dinamik olarak veri ekleyecek -->
+                </tbody>
+            </table>
+        </div>
+
+        <div id="leaveRequestsContent" class="hidden mt-4">
+            <h2 class="text-2xl font-bold mb-4">İzin Talepleri</h2>
+            <table id="leaveRequestsTable" class="min-w-full bg-white border border-gray-300">
+                <thead class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
+                    <tr>
+                        <th class="border px-4 py-2">ID</th>
+                        <th class="border px-4 py-2">Personel Adı</th>
+                        <th class="border px-4 py-2">Başlangıç Tarihi</th>
+                        <th class="border px-4 py-2">Bitiş Tarihi</th>
+                        <th class="border px-4 py-2">Durum</th>
+                        <th class="border px-4 py-2">Sebep</th>
+                        <th class="border px-4 py-2">İzin Günü</th>
+                        <th class="border px-4 py-2">Eylem</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- DataTable.js burada dinamik olarak veri ekleyecek -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</body>
+</html>

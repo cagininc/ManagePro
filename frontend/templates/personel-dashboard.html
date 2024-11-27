@@ -1,0 +1,109 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personel Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script defer src="{% static 'js/personel-dashboard.js' %}"></script>
+</head>
+<body class="bg-gray-100">
+
+    <!-- Navbar -->
+    <nav class="flex justify-between items-center p-3 md:py-10">
+        <h1 class="text-3xl font-semibold text-[#54BD95]">Personel Paneli</h1>
+        <ul class="flex gap-3 md:gap-10 items-center">
+            <p id="welcomeMessage"></p>
+            <button id="officeButton" class="p-2 rounded-full px-3 bg-white text-black border border-black hover:bg-gray-100 shadow-md">
+                Ofise Giriş Yap
+            </button>
+            <a id="logout" href="" class="text-md p-1 rounded-md text-gray-500">
+                Çıkış yap
+            </a>
+        </ul>
+    </nav>
+
+    <!-- Tab Menüsü -->
+    <div class="container mx-auto mt-8">
+        <ul class="flex border-b">
+            <li class="mr-1">
+                <a class="bg-white inline-block py-2 px-4 text-blue-500 font-semibold" href="#" id="attendanceTab">
+                    Giriş-Çıkış Kayıtları
+                </a>
+            </li>
+            <li class="mr-1">
+                <a class="bg-gray-300 inline-block py-2 px-4 text-gray-500 hover:text-blue-500 hover:bg-white font-semibold" href="#" id="leaveTab">
+                    İzinlerim
+                </a>
+            </li>
+            <li class="mr-1">
+                <a class="bg-gray-300 inline-block py-2 px-4 text-gray-500 hover:text-blue-500 hover:bg-white font-semibold" href="#" id="createLeaveTab">
+                    İzin Talebi Ekle
+                </a>
+            </li>
+        </ul>
+
+        <!-- Tab İçerikleri -->
+        <div id="attendanceContent" class="mt-4">
+            <h2 class="text-2xl font-bold mb-4">Haftalık Giriş-Çıkış Kayıtlarım</h2>
+            <table id="weeklyAttendanceTable" class="w-full border-collapse border border-gray-200">
+                <thead class="bg-gray-200">
+                    <tr>
+                        <th class="border border-gray-300 px-4 py-2">Tarih</th>
+                        <th class="border border-gray-300 px-4 py-2">Giriş Saati</th>
+                        <th class="border border-gray-300 px-4 py-2">Çıkış Saati</th>
+                        <th class="border border-gray-300 px-4 py-2">Ofiste Geçirilen Süre</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Dinamik veriler buraya eklenecek -->
+                </tbody>
+            </table>
+        </div>
+
+        <div id="leaveContent" class="mt-4 hidden">
+            <h2 class="text-2xl font-bold mb-4">İzinlerim</h2>
+            <table id="leaveTable" class="w-full border-collapse border border-gray-200">
+                <thead class="bg-gray-200">
+                    <tr>
+                        <th class="border border-gray-300 px-4 py-2">Başlangıç Tarihi</th>
+                        <th class="border border-gray-300 px-4 py-2">Bitiş Tarihi</th>
+                        <th class="border border-gray-300 px-4 py-2">Neden</th>
+                        <th class="border border-gray-300 px-4 py-2">Durum</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Dinamik veriler buraya eklenecek -->
+                </tbody>
+            </table>
+        </div>
+
+        <div id="createLeaveContent" class="mt-8 hidden bg-white p-6 rounded-lg shadow-md">
+            <h2 class="text-3xl font-bold mb-6 text-center text-blue-600">İzin Talebi Ekle</h2>
+            <form id="leaveForm" class="space-y-6">
+                <div>
+                    <label for="start_date" class="block text-gray-700 font-semibold mb-2">Başlangıç Tarihi:</label>
+                    <input type="date" id="start_date" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                </div>
+                <div>
+                    <label for="end_date" class="block text-gray-700 font-semibold mb-2">Bitiş Tarihi:</label>
+                    <input type="date" id="end_date" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                </div>
+                <div>
+                    <label for="reason" class="block text-gray-700 font-semibold mb-2">Neden:</label>
+                    <textarea id="reason" rows="4" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Lütfen izin nedeninizi açıklayın..." required></textarea>
+                </div>
+                <div class="flex justify-center">
+                    <button type="submit" class="p-2 rounded-full px-5 bg-white text-black border border-black hover:bg-gray-200 shadow-md">
+                        Gönder
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+    </div>
+
+</body>
+</html>

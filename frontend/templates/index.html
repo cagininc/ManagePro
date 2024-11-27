@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <title>ManagePro</title>
+    <!-- <style>
+      .background-image {
+        background: url('images/HERO3.jpeg') no-repeat center center;
+        background-size: cover;
+      }
+    </style> -->
+  </head>
+  <body>
+    <main class="p-3 md:p-0 md:w-[80%] mx-auto">
+      <!-- Navbar -->
+      <nav class="flex justify-center items-center gap-10 p-3 md:py-10">
+        <h1 class="text-3xl font-semibold text-[#54BD95]">ManagePro</h1>
+
+        <ul class="flex items-center gap-10">
+          <li><a href="#" class="text-md font-semibold text-gray-500 hover:text-gray-800">Home</a></li>
+          <li><a href="#" class="text-md font-semibold text-gray-500 hover:text-gray-800">Product</a></li>
+          <li><a href="#" class="text-md font-semibold text-gray-500 hover:text-gray-800">FAQ</a></li>
+          <li><a href="#" class="text-md font-semibold text-gray-500 hover:text-gray-800">Blog</a></li>
+          <li><a href="#" class="text-md font-semibold text-gray-500 hover:text-gray-800">About Us</a></li>
+        </ul>
+      </nav>
+
+      <!-- Header -->
+      <header class="grid grid-cols-1 md:grid-cols-2 py-5 md:py-20 items-center gap-10">
+        
+        <div class="flex flex-col p-5 md:p-10 gap-10">
+          <h1 class="text-4xl md:text-6xl font-bold">
+            Ofis Yönetiminizi Kolaylaştırıyoruz
+          </h1>
+          <p class="font-semibold md:pr-20">
+            Günlük çalışma rutininizi düzenleyin ve daha verimli hale getirin.
+            ManagePro ile çalışmanızı kolaylaştırın.
+          </p>
+          <div class="flex gap-5 items-center mt-5">
+            <a href="/user/yonetici/login/" class="p-2 rounded-full px-5 bg-white text-black border border-black hover:bg-gray-200 shadow-md">
+              Yönetici Girişi
+            </a>
+            <a href="/user/personel/login/" class="p-2 rounded-full px-5 bg-white text-black border border-black hover:bg-gray-200 shadow-md">
+              Personel Girişi
+            </a>
+          </div>
+        </div>
+
+        {% load static %}
+        <div class="w-full">
+          <img src="{% static 'images/HERO1.jpeg' %}" alt="image" class="w-[140%] h-auto object-cover transform -translate-x-20 -translate-y-0">
+        </div>
+
+      </header>
+      <!-- Header -->
+    </main>
+
+    <!-- Footer -->
+    <div class="bg-black text-white">
+      <footer class="p-5 md:p-0 md:w-[80%] mx-auto py-10">
+        <!-- bottom -->
+        <div class="flex flex-col md:flex-row gap-3 justify-center items-center py-5">
+          <p>© 2024 ManagePro. Copyright and rights reserved</p>
+          <p>Terms and Conditions | Privacy Policy</p>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>
