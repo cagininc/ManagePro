@@ -62,6 +62,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Giriş-Çıkış düğmesi
     const officeButton = document.getElementById("officeButton");
     if (officeButton) {
+        await checkOfficeStatus(officeButton); // Ofiste olup olmadığını kontrol et ve düğme metnini ayarla
         setupOfficeButton(officeButton);
     }
 
@@ -142,6 +143,38 @@ async function updateWeeklyAttendanceTable() {
     }
 }
 
+// Ofiste olup olmadığını kontrol eden fonksiyon
+async function checkOfficeStatus(officeButton) {
+    const token = localStorage.getItem("accessToken");
+    try {
+        const response = await fetch("http://127.0.0.1:8000/api/attendance/status/", {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            officeButton.textContent = data.isCheckedIn ? "Ofisten Çıkış Yap" : "Ofise Giriş Yap";
+        } else {
+            console.error("Ofis durumu alınamadı.");
+        }
+    } catch (error) {
+        console.error("Bir hata oluştu:", error);
+    }
+}
+
+// Süre formatlama fonksiyonu
+function formatDuration(durationString) {
+    if (!durationString) return "-";
+
+    const durationParts = durationString.split(":");
+    const hours = parseInt(durationParts[0], 10);
+    const minutes = parseInt(durationParts[1], 10);
+
+    return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
+}
+
 // İzin tablosunu güncelleyen fonksiyon
 async function updateLeaveTable() {
     const leaveTableBody = document.querySelector("#leaveTable tbody");
@@ -172,17 +205,6 @@ async function updateLeaveTable() {
     } catch (error) {
         console.error("Bir hata oluştu:", error);
     }
-}
-
-// Süre formatlama fonksiyonu
-function formatDuration(durationString) {
-    if (!durationString) return "-";
-
-    const durationParts = durationString.split(":");
-    const hours = parseInt(durationParts[0], 10);
-    const minutes = parseInt(durationParts[1], 10);
-
-    return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
 }
 
 // İzin Talebi Gönderme

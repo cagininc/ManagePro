@@ -33,10 +33,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Tab seçimini değiştiren fonksiyon
     const activateTab = (activeTab, inactiveTab) => {
-        activeTab.classList.add("bg-white", "text-blue-500");
-        activeTab.classList.remove("bg-gray-300", "text-gray-500");
-        inactiveTab.classList.add("bg-gray-300", "text-gray-500");
-        inactiveTab.classList.remove("bg-white", "text-blue-500");
+        if (activeTab && inactiveTab) {
+            activeTab.classList.add("bg-white", "text-blue-500");
+            activeTab.classList.remove("bg-gray-300", "text-gray-500");
+            inactiveTab.classList.add("bg-gray-300", "text-gray-500");
+            inactiveTab.classList.remove("bg-white", "text-blue-500");
+        }
     };
 
     // Tab event listener'ları
@@ -92,8 +94,7 @@ document.addEventListener("DOMContentLoaded", () => {
     function updateLeaveRequestsTable() {
         // Eğer tablo zaten oluşturulmuşsa, önce yok et
         if ($.fn.DataTable.isDataTable('#leaveRequestsTable')) {
-             $('#leaveRequestsTable').DataTable().clear().destroy();
-
+            $('#leaveRequestsTable').DataTable().clear().destroy();
         }
 
         // Yeni DataTable oluştur
@@ -115,13 +116,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 { data: "end_date" },
                 { data: "status" },
                 { data: "reason" },
-                {data:"remaining_leave_days"},
+                { data: "remaining_leave_days" },
                 {
                     data: null,
                     render: (data, type, row) => {
                         return `
-                            <button class="approve-button bg-green-500 text-white px-2 py-1 text-xs rounded-full">Onayla</button>
-                            <button class="reject-button bg-red-500 text-white px-2 py-1 text-xs rounded-full">Reddet</button>
+                            <button class="approve-button bg-green-500 text-white px-2 py-1 text-xs rounded-full" data-id="${row.id}">Onayla</button>
+                            <button class="reject-button bg-red-500 text-white px-2 py-1 text-xs rounded-full" data-id="${row.id}">Reddet</button>
                         `;
                     },
                 },
@@ -131,20 +132,46 @@ document.addEventListener("DOMContentLoaded", () => {
             },
         });
 
-        // Event Listener düğmeler(onayla ve reddet)
+        // Event Listener düğmeler (onayla ve reddet)
         $('#leaveRequestsTable tbody').on('click', '.approve-button', function () {
-            const rowData = leaveTable.row($(this).parents('tr')).data();
-            handleLeaveAction(rowData.id, "approved");
+            const rowIndex = $(this).closest('tr').index();
+            const rowData = leaveTable.row(rowIndex).data();
+
+            if (!rowData) {
+                console.error("Satır verisi bulunamadı.");
+                alert("Bir hata oluştu, lütfen sayfayı yenileyin ve tekrar deneyin.");
+                return;
+            }
+
+            handleLeaveAction(rowData.id, "approved", leaveTable, rowData);
         });
 
         $('#leaveRequestsTable tbody').on('click', '.reject-button', function () {
-            const rowData = leaveTable.row($(this).parents('tr')).data();
-            handleLeaveAction(rowData.id, "rejected");
+            const rowIndex = $(this).closest('tr').index();
+            const rowData = leaveTable.row(rowIndex).data();
+
+            if (!rowData) {
+                console.error("Satır verisi bulunamadı.");
+                alert("Bir hata oluştu, lütfen sayfayı yenileyin ve tekrar deneyin.");
+                return;
+            }
+
+            handleLeaveAction(rowData.id, "rejected", leaveTable, rowData);
         });
     }
 
     // İzin talebi durumu değiştirme fonksiyonu
-    function handleLeaveAction(leaveId, newStatus) {
+    function handleLeaveAction(leaveId, newStatus, leaveTable) {
+        // Öncelikle status değerinin geçerli olduğundan emin ol
+        if (newStatus !== "approved" && newStatus !== "rejected") {
+            console.error("Geçersiz status değeri:", newStatus);
+            alert("Hata: Geçersiz durum değeri. Lütfen geçerli bir işlem yapınız.");
+            return; // Geçersiz bir durum ise fonksiyondan çıkıyoruz
+        }
+    
+        console.log("Leave ID:", leaveId);
+        console.log("Gönderilen status:", newStatus); // Kontrol için newStatus yazdırılıyor
+    
         fetch(`http://127.0.0.1:8000/api/leave/update/${leaveId}/`, {
             method: "PATCH",
             headers: {
@@ -153,24 +180,28 @@ document.addEventListener("DOMContentLoaded", () => {
             },
             body: JSON.stringify({ status: newStatus }),
         })
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error("Durum güncellenemedi");
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error("Durum güncellenemedi");
+            }
+            return response.json();
+        })
+        .then((data) => {
+            alert(data.message);
+    
+            // Güncellenmiş satırı tabloda değiştiriyoruz
+            leaveTable.rows().every(function () {
+                if (this.data().id === leaveId) {
+                    const updatedData = this.data();
+                    updatedData.status = newStatus; // Durumu güncelle
+                    this.data(updatedData).draw(false);
+                    console.log("Satır güncellendi:", updatedData);
                 }
-                return response.json();
-            })
-            .then((data) => {
-                alert(data.message);
-                // updateLeaveRequestsTable(); // Tabloyu güncelle
-                //sadece satırı değiştiriyoruz
-                const updatedLeave = data.updated_leave;
-        leaveTable.row($(`#leaveRequestsTable tbody tr:has(button[data-id="${updatedLeave.id}"])`))
-            .data(updatedLeave)
-            .draw(false); //
-            })
-            .catch((error) => {
-                console.error(error);
-                alert("Bir hata oluştu");
             });
+        })
+        .catch((error) => {
+            console.error("Hata:", error);
+            alert("Bir hata oluştu");
+        });
     }
-});
+})    

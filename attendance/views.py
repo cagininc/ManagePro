@@ -65,7 +65,7 @@ def check_out(request):
     attendance.save()
     return Response({"message": "Ofisten çıkış kaydedildi."}, status=200)
 
-#kullanıcı ofiste bulunma durumu kontrol
+# Kullanıcı ofiste bulunma durumu kontrol
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def check_status(request):
@@ -85,9 +85,16 @@ def check_status(request):
             return Response({"status": "not_checked_in"}, status=200)  # Hiç giriş yapmamış
     except Attendance.DoesNotExist:
         return Response({"status": "not_checked_in"}, status=200)
-
-
-#personel dashboard weekly report
+# Ofiste geçirilen süreyi formatlama
+def format_duration(duration):
+    """
+    Ofiste geçirilen süreyi HH:MM formatına dönüştürür.
+    """
+    total_seconds = int(duration.total_seconds())
+    hours, remainder = divmod(total_seconds, 3600)
+    minutes, _ = divmod(remainder, 60)  #saniye kısmına ihtiyacımız yok 
+    return f"{hours:02}:{minutes:02}"
+# Personel dashboard weekly report
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def user_attendance_weekly(request):
@@ -101,13 +108,15 @@ def user_attendance_weekly(request):
             "date": record.date.strftime('%Y-%m-%d'),
             "check_in": record.check_in.strftime('%H:%M') if record.check_in else None,
             "check_out": record.check_out.strftime('%H:%M') if record.check_out else None,
-            "duration": str(record.office_duration) if record.office_duration else None
+            "duration": format_duration(record.office_duration) if record.office_duration else None
         }
         for record in attendance_records
     ]
     return Response(attendance_data)
 
-# Yonetici dashboard server-side dataTable 
+
+
+# Yönetici dashboard server-side dataTable
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def server_side_attendance(request):
@@ -141,7 +150,7 @@ def server_side_attendance(request):
             "date": record.date.strftime('%Y-%m-%d'),
             "check_in": record.check_in.strftime('%H:%M') if record.check_in else "-",
             "check_out": record.check_out.strftime('%H:%M') if record.check_out else "-",
-            "office_duration": str(record.office_duration),
+            "office_duration": format_duration(record.office_duration) if record.office_duration else "-",
             "late_duration": str(record.late_duration),
         }
         for record in page.object_list

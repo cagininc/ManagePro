@@ -3,6 +3,9 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
 from leave.models import Leave
+from rest_framework import status as http_status
+
+from .serializers import LeaveStatusUpdateSerializer
 
 
 class LeavePagination(PageNumberPagination):
@@ -80,7 +83,7 @@ def all_leave_requests(request):
             "end_date": leave.end_date.strftime('%Y-%m-%d'),
             "reason": leave.reason,
             "status": leave.get_status_display(),
-            "remaining_leave_days": leave.user.remaining_leave_days,  # Eklendi
+            "remaining_leave_days": leave.user.remaining_leave_days,  # 
 
         }
         for leave in paginated_leaves
@@ -101,36 +104,43 @@ def update_leave_status(request, leave_id):
     Belirli bir izin talebinin durumunu günceller ve kalan izin günlerini azaltır.
     """
     if not request.user.is_staff:
-        return Response({"error": "Bu işlem için yetkiniz yok."}, status=403)
+        return Response({"error": "Bu işlem için yetkiniz yok."}, status=http_status.HTTP_403_FORBIDDEN)
 
     try:
         leave = Leave.objects.get(id=leave_id)
     except Leave.DoesNotExist:
-        return Response({"error": "İzin talebi bulunamadı."}, status=404)
+        return Response({"error": "İzin talebi bulunamadı."}, status=http_status.HTTP_404_NOT_FOUND)
 
-    new_status = request.data.get("status")
-    if new_status not in ["approved", "rejected"]:
-        return Response({"error": "Geçersiz durum değeri."}, status=400)
+    print("Gelen request.data:", request.data)  # Gelen veriyi kontrol etmek için
+    serializer = LeaveStatusUpdateSerializer(leave, data=request.data, partial=True)
 
-    # Eğer durum "approved" olarak değiştiriliyorsa
-    if new_status == "approved" and leave.status != "approved":
-        user = leave.user
-        days = (leave.end_date - leave.start_date).days + 1
+    if serializer.is_valid():
+        new_status = serializer.validated_data.get('status')
+        print("Serializer doğrulandı, yeni status:", new_status)  # Serializer doğrulandıktan sonra status değerini kontrol etmek için
 
-        # Kalan izin günlerini kontrol et
-        if user.remaining_leave_days >= days:
-            user.remaining_leave_days -= days
-            user.save()
+        # Eğer durum "approved" olarak değiştiriliyorsa
+        if new_status == "approved" and leave.status != "approved":
+            user = leave.user
+            days = (leave.end_date - leave.start_date).days + 1
 
-            # Eğer kalan izin günleri 3 veya daha az ise bildirim
-            if user.remaining_leave_days <= 3:
-                print(f"Uyarı: {user.username} için kalan izin günleri kritik seviyede: {user.remaining_leave_days}")
-                # Burada bir websocket ,django channels
+            # Kalan izin günlerini kontrol et
+            if user.remaining_leave_days >= days:
+                user.remaining_leave_days -= days
+                user.save()
 
-        else:
-            return Response({"error": "Yeterli izin günü yok."}, status=400)
+                # Eğer kalan izin günleri 3 veya daha az ise bildirim
+                if user.remaining_leave_days <= 3:
+                    print(f"Uyarı: {user.username} için kalan izin günleri kritik seviyede: {user.remaining_leave_days}")
+            else:
+                print("Yeterli izin günü yok, işlem reddedildi.")  # Yeterli izin günleri olmadığında
+                return Response({"error": "Yeterli izin günü yok."}, status=http_status.HTTP_400_BAD_REQUEST)
 
-    leave.status = new_status
-    leave.save()
+        leave.status = new_status
+        leave.save()
+        print(f"İzin talebi '{leave.get_status_display()}' olarak güncellendi.")  # Başarıyla güncellenen izin talebi
 
-    return Response({"message": f"İzin talebi '{leave.get_status_display()}' olarak güncellendi."})
+        return Response({"message": f"İzin talebi '{leave.get_status_display()}' olarak güncellendi."})
+
+    # Serializer hatası varsa, hatayı loglayalım
+    print("Serializer hataları:", serializer.errors)
+    return Response(serializer.errors, status=http_status.HTTP_400_BAD_REQUEST)
