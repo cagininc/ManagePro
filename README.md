@@ -1,6 +1,6 @@
 # ManagePro
 
-ManagePro is a  admin dashboard application designed to simplify personnel management processes. The platform enables administrators to handle tasks like monitoring attendance, managing leave requests, and sending critical notifications with an intuitive and responsive user interface.
+ManagePro is a  admin dashboard application designed to simplify personnel management processes.This project was developed as part of a given task and serves as an example of a Turkish-language application. The codebase includes comments in Turkish. The platform enables administrators to handle tasks like monitoring attendance, managing leave requests, and sending critical notifications with an intuitive and responsive user interface.
 ## Screenshots
 ![UI Screenshot](./ui.png)
 ## Features
