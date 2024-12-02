@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-    // Hoşgeldiniz mesajını ayarla
+    //welcome mesajı
     const token = localStorage.getItem("accessToken");
     const welcomeMessage = document.getElementById("welcomeMessage");
 

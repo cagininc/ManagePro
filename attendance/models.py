@@ -35,15 +35,22 @@ class Attendance(models.Model):
         # Ofiste geçen süreyi hesapla (ilk giriş ve son çıkış arasındaki süre)
         if self.check_in and self.check_out:
             check_in_datetime = datetime.combine(self.date, self.check_in)
-            check_in_datetime = make_aware(check_in_datetime, istanbul_tz)  # İstanbul saat dilimine göre ayarlama
+            check_in_datetime = make_aware(check_in_datetime, istanbul_tz)
 
             check_out_datetime = datetime.combine(self.date, self.check_out)
-            check_out_datetime = make_aware(check_out_datetime, istanbul_tz)  # İstanbul saat dilimine göre ayarlama
+            check_out_datetime = make_aware(check_out_datetime, istanbul_tz)
 
             duration = check_out_datetime - check_in_datetime
             # Sadece saat ve dakikayı tutmak için saniyeyi yuvarlama
             duration = timedelta(hours=duration.seconds // 3600, minutes=(duration.seconds // 60) % 60)
             self.office_duration = duration
+
+        # Eğer check_in var ama check_out yoksa, çıkış saati otomatik olarak gece 00:00 olarak ayarlanır(not planned yet)
+        # if self.check_in and not self.check_out:
+        #     midnight = time(0, 0)  # Gece 00:00
+        #     check_out_datetime = datetime.combine(self.date + timedelta(days=1), midnight)
+        #     check_out_datetime = make_aware(check_out_datetime, istanbul_tz)
+        #     self.check_out = check_out_datetime.time()
 
         super().save(*args, **kwargs)
 

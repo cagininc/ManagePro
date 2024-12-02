@@ -46,62 +46,81 @@
         </ul>
 
         <!-- Tab İçerikleri -->
-        <div id="attendanceContent" class="mt-4">
-            <h2 class="text-2xl font-bold mb-4">Haftalık Giriş-Çıkış Kayıtlarım</h2>
-            <table id="weeklyAttendanceTable" class="w-full border-collapse border border-gray-200">
-                <thead class="bg-gray-200">
-                    <tr>
-                        <th class="border border-gray-300 px-4 py-2">Tarih</th>
-                        <th class="border border-gray-300 px-4 py-2">Giriş Saati</th>
-                        <th class="border border-gray-300 px-4 py-2">Çıkış Saati</th>
-                        <th class="border border-gray-300 px-4 py-2">Ofiste Geçirilen Süre</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Dinamik veriler buraya eklenecek -->
-                </tbody>
-            </table>
+        <div id="attendanceContent" class="mt-8">
+            <h2 class="text-3xl font-semibold mb-6 text-gray-800">Haftalık Giriş-Çıkış Kayıtlarım</h2>
+            <div class="overflow-hidden shadow-lg rounded-lg border border-gray-300">
+                <table id="weeklyAttendanceTable" class="min-w-full bg-gray-50">
+                    <thead class="bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300">
+                        <tr>
+                            <th class="border-b border-gray-400 px-6 py-4 text-left text-gray-800 font-medium text-sm">Tarih</th>
+                            <th class="border-b border-gray-400 px-6 py-4 text-left text-gray-800 font-medium text-sm">Giriş Saati</th>
+                            <th class="border-b border-gray-400 px-6 py-4 text-left text-gray-800 font-medium text-sm">Çıkış Saati</th>
+                            <th class="border-b border-gray-400 px-6 py-4 text-left text-gray-800 font-medium text-sm">Ofiste Geçirilen Süre</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-300">
+                        <!-- Dinamik veriler buraya eklenecek -->
+                        <tr class="hover:bg-gray-100">
+                            <td class="px-6 py-4 text-sm text-gray-700">Örnek Tarih</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">09:00</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">17:00</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">8 saat</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
-
-        <div id="leaveContent" class="mt-4 hidden">
-            <h2 class="text-2xl font-bold mb-4">İzinlerim</h2>
-            <table id="leaveTable" class="w-full border-collapse border border-gray-200">
-                <thead class="bg-gray-200">
-                    <tr>
-                        <th class="border border-gray-300 px-4 py-2">Başlangıç Tarihi</th>
-                        <th class="border border-gray-300 px-4 py-2">Bitiş Tarihi</th>
-                        <th class="border border-gray-300 px-4 py-2">Neden</th>
-                        <th class="border border-gray-300 px-4 py-2">Durum</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Dinamik veriler buraya eklenecek -->
-                </tbody>
-            </table>
+        
+        <div id="leaveContent" class="mt-8 hidden">
+            <h2 class="text-3xl font-semibold mb-6 text-gray-800">İzinlerim</h2>
+            <div class="overflow-hidden shadow-lg rounded-lg border border-gray-300">
+                <table id="leaveTable" class="min-w-full bg-gray-50">
+                    <thead class="bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300">
+                        <tr>
+                            <th class="border-b border-gray-400 px-6 py-4 text-left text-gray-800 font-medium text-sm">Başlangıç Tarihi</th>
+                            <th class="border-b border-gray-400 px-6 py-4 text-left text-gray-800 font-medium text-sm">Bitiş Tarihi</th>
+                            <th class="border-b border-gray-400 px-6 py-4 text-left text-gray-800 font-medium text-sm">Neden</th>
+                            <th class="border-b border-gray-400 px-6 py-4 text-left text-gray-800 font-medium text-sm">Durum</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-300">
+                        <!-- Dinamik veriler buraya eklenecek -->
+                        <tr class="hover:bg-gray-100">
+                            <td class="px-6 py-4 text-sm text-gray-700">Örnek Başlangıç Tarihi</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Örnek Bitiş Tarihi</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Örnek Neden</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Onaylandı</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
+        
 
-        <div id="createLeaveContent" class="mt-8 hidden bg-white p-6 rounded-lg shadow-md">
-            <h2 class="text-3xl font-bold mb-6 text-center text-blue-600">İzin Talebi Ekle</h2>
+        <div id="createLeaveContent" class="mt-8 hidden bg-gray-50 p-8 rounded-lg shadow-lg border border-gray-300 max-w-lg mx-auto">
+            <h2 class="text-3xl font-semibold mb-8 text-center text-gray-800">İzin Talebi Ekle</h2>
             <form id="leaveForm" class="space-y-6">
                 <div>
-                    <label for="start_date" class="block text-gray-700 font-semibold mb-2">Başlangıç Tarihi:</label>
-                    <input type="date" id="start_date" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    <label for="start_date" class="block text-gray-800 font-medium mb-2">Başlangıç Tarihi:</label>
+                    <input type="date" id="start_date" class="w-full px-4 py-2 border border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500" required>
                 </div>
                 <div>
-                    <label for="end_date" class="block text-gray-700 font-semibold mb-2">Bitiş Tarihi:</label>
-                    <input type="date" id="end_date" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    <label for="end_date" class="block text-gray-800 font-medium mb-2">Bitiş Tarihi:</label>
+                    <input type="date" id="end_date" class="w-full px-4 py-2 border border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500" required>
                 </div>
                 <div>
-                    <label for="reason" class="block text-gray-700 font-semibold mb-2">Neden:</label>
-                    <textarea id="reason" rows="4" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Lütfen izin nedeninizi açıklayın..." required></textarea>
+                    <label for="reason" class="block text-gray-800 font-medium mb-2">Neden:</label>
+                    <textarea id="reason" rows="4" class="w-full px-4 py-2 border border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500" placeholder="Lütfen izin nedeninizi açıklayın..." required></textarea>
                 </div>
                 <div class="flex justify-center">
-                    <button type="submit" class="p-2 rounded-full px-5 bg-white text-black border border-black hover:bg-gray-200 shadow-md">
+                    <button type="submit" class="p-3 rounded-full px-6 bg-gradient-to-r from-gray-300 to-gray-400 text-gray-800 hover:bg-gradient-to-r hover:from-gray-400 hover:to-gray-500 shadow-lg transition ease-in-out duration-300">
                         Gönder
                     </button>
                 </div>
             </form>
         </div>
+        
+
         
     </div>
 
