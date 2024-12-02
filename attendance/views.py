@@ -1,4 +1,6 @@
 from datetime import timedelta
+from datetime import date
+from datetime import timezone
 from django.shortcuts import render
 from django.utils.timezone import now
 from rest_framework.decorators import api_view, permission_classes
@@ -7,6 +9,40 @@ from rest_framework.response import Response
 from attendance.models import Attendance
 from django.core.paginator import Paginator
 from django.db.models import Q
+from notifications.utils import send_notification
+
+
+#Notifications
+
+#personel geç kaldığında gidecek olan bildirim
+
+def mark_late_employee(request, employee_id):
+    # ... geç kalma işlemleri burada ...
+    # Yöneticiyi bilgilendirme
+    send_notification(user_id=manager.id, message="Employee X is late.")
+
+
+
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def check_office_status(request):
+    """
+    Kullanıcının ofiste olup olmadığını kontrol eder
+    """
+    user = request.user
+    today= date.today()
+    attendance = Attendance.objects.filter(user=user,date=today).last()
+    if attendance and attendance.check_in and not attendance.check_out:
+        return Response({'isCheckedIn':True})# personel hala ofiste(çıkış yapmadı)
+    else:
+        #Kullanıcı ofiste değil 
+        return Response({'isCheckedIn':False})
+    
+    
+
+
 
 
 @api_view(['GET'])
