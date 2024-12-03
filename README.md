@@ -18,7 +18,8 @@ ManagePro is a  admin dashboard application designed to simplify personnel manag
   - Admin approval/rejection of leave requests.
   - Automatic deduction of remaining leave days upon approval.
   - Notification triggers for low remaining leave days.
-
+- **Notification System:**
+- Implemented a real-time notification system using Django Channels, Celery, and Redis to manage personnel alerts such as late check-ins or leave requests. This architecture supports scalable, real-time communication and can easily accommodate additional notification types in the future.
 - **Real-Time Updates:**
   - Seamless integration with DataTables for dynamic data handling.
   - Immediate feedback on leave approval or rejection actions.
