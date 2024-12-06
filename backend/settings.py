@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 from datetime import timedelta
+from celery.schedules import crontab
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -48,7 +50,7 @@ INSTALLED_APPS = [
        'notifications'
      
 ]
-ASGI_APPLICATION = 'backend.asgi.application'  # Proje adınızı uygun şekilde değiştirmelisiniz
+ASGI_APPLICATION = 'backend.asgi.application'  
 #we are going to use redis for this layer
 CHANNEL_LAYERS = {
     'default': {
@@ -65,6 +67,13 @@ CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 CELERY_TIMEZONE = 'Europe/Istanbul'
+
+#Celery late employee control( check-in sırasında yapılmasına karar verildi)
+# CELERY_BEAT_SCHEDULE = {
+#     'check_late_employees': {
+#         'task': 'notifications.tasks.mark_late_employees',  # Görev adı
+#         'schedule': crontab(hour=11, minute=0),  # Her gün sabah 11:00'de çalışacak
+#     },}
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -91,6 +100,7 @@ SIMPLE_JWT = {
 
 
 MIDDLEWARE = [
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'corsheaders.middleware.CorsMiddleware',  
     'django.middleware.common.CommonMiddleware',
     'django.middleware.security.SecurityMiddleware',
@@ -103,6 +113,11 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'backend.urls'
+
+
+#part of whitenoise setup
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
 
 TEMPLATES = [
     {

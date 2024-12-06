@@ -1,6 +1,5 @@
-from datetime import timedelta
-from datetime import date
-from datetime import timezone
+from datetime import time, timedelta, date, timezone
+from django.utils import timezone
 from django.shortcuts import render
 from django.utils.timezone import now
 from rest_framework.decorators import api_view, permission_classes
@@ -10,17 +9,9 @@ from attendance.models import Attendance
 from django.core.paginator import Paginator
 from django.db.models import Q
 from notifications.utils import send_notification
-
-
-#Notifications
-
-#personel geç kaldığında gidecek olan bildirim
-
-def mark_late_employee(request, employee_id):
-    # ... geç kalma işlemleri burada ...
-    # Yöneticiyi bilgilendirme
-    send_notification(user_id=manager.id, message="Employee X is late.")
-
+from user.models import CustomUser
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
 
 
 
@@ -71,18 +62,66 @@ def user_attendance_list(request):
 @permission_classes([IsAuthenticated])
 def check_in(request):
     user = request.user
-    today = now().date()
+    print(f"[DEBUG] Received check-in request from user: {user.username}")
 
-    # Aynı gün için zaten check-in yapılmış mı kontrol 
+    today = timezone.now().date()
+    print(f"[DEBUG] Today's date: {today}")
+
+    # Aynı gün için zaten check-in yapılmış mı kontrol
     attendance, created = Attendance.objects.get_or_create(user=user, date=today)
+    print(f"[DEBUG] Attendance record status - Created: {created}")
 
+    # Eğer check-in zaten varsa hata döndür
     if attendance.check_in:
+        print(f"[DEBUG] User {user.username} has already checked in today at {attendance.check_in}")
         return Response({"message": "Bugün zaten ofise giriş yaptınız."}, status=400)
 
-    attendance.check_in = now().time()
-    attendance.save()
-    return Response({"message": "Ofise giriş kaydedildi."}, status=200)
+    # Şu anki zamanı al ve check-in saatine kaydet
+    check_in_time = timezone.now()
+    print(f"[DEBUG] Current check-in time: {check_in_time}")
 
+    attendance.check_in = check_in_time.time()
+    attendance.save()
+    print(f"[DEBUG] Check-in time saved for user: {user.username} at {attendance.check_in}")
+
+    # Sabah geç kalma saati - örneğin 08:30
+    office_start_time = time(8, 30)
+    print(f"[DEBUG] Office start time: {office_start_time}")
+
+    # Geç kalma kontrolü
+    if check_in_time.time() > office_start_time:
+        # Admin kullanıcılarını bul ve WebSocket ile bildirim gönder
+        admin_users = CustomUser.objects.filter(role='Admin')
+    channel_layer = get_channel_layer()
+    if not channel_layer:
+        print(f"[ERROR] Channel layer is None. WebSocket notifications cannot be sent.")
+        return Response({"message": "Bildirim sistemi çalışmıyor. Lütfen sistem yöneticisiyle iletişime geçin."}, status=500)
+
+    print(f"[DEBUG] Channel layer acquired successfully.")
+
+    for admin in admin_users:
+            message = f"{user.username} is late tooday."
+            print(f"[DEBUG] Preparing to send notification to admin: {admin.username}")
+
+            try:
+                # Bildirim gönderme işlemi
+                async_to_sync(channel_layer.group_send)(
+                    "managers_notifications",
+                    {
+                        "type": "notification_message",
+                        "message": message,
+                    }
+                )
+                # Eğer bu satır başarılı bir şekilde çalışırsa bu log gözükecek
+                print(f"[DEBUG] Notification successfully sent to admin: {admin.username}")
+
+            except Exception as e:
+                # Eğer bir hata oluşursa, bu log ile hatayı gösterebiliriz
+                print(f"[ERROR] Failed to send notification to admin: {admin.username}. Error: {str(e)}")
+
+    return Response({"message": "Ofise giriş kaydedildi."}, status=200)
+        
+#checkout
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def check_out(request):

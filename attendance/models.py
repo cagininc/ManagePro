@@ -1,30 +1,26 @@
 from django.db import models
-from django.utils.timezone import now, make_aware
+from django.utils import timezone
 from datetime import datetime, time, timedelta
-import pytz
 
 class Attendance(models.Model):
     user = models.ForeignKey('user.CustomUser', on_delete=models.CASCADE)  # Personel bilgisi
-    date = models.DateField(default=now)  # Giriş günü
+    date = models.DateField(default=timezone.now)  # Giriş günü
     check_in = models.TimeField(null=True, blank=True)  # Ofise ilk giriş saati
     check_out = models.TimeField(null=True, blank=True)  # Ofisten son çıkış saati
     office_duration = models.DurationField(null=True, blank=True)  # Ofiste geçen toplam süre
     late_duration = models.DurationField(null=True, blank=True)  # Sabah 8:00'e göre geç kalma süresi
 
     def save(self, *args, **kwargs):
-        # İstanbul saat dilimi tanımlaması
-        istanbul_tz = pytz.timezone('Europe/Istanbul')
+        # Sabah ofise giriş saati (08:00)
+        morning_start = time(8, 0)
 
-        # Sabah ofise giriş saati
-        morning_start = time(8, 0)  # Sabah 08:00
-
-        # Zaman dilimi ile ilgili işlemler
+        # check_in zamanı belirlenmişse işlemleri gerçekleştir
         if self.check_in:
             check_in_datetime = datetime.combine(self.date, self.check_in)
-            check_in_datetime = make_aware(check_in_datetime, istanbul_tz)  # İstanbul saat dilimine göre ayarlama
+            check_in_datetime = timezone.make_aware(check_in_datetime, timezone.get_current_timezone())  # Saat dilimini uygun hale getir
 
             morning_start_datetime = datetime.combine(self.date, morning_start)
-            morning_start_datetime = make_aware(morning_start_datetime, istanbul_tz)  # İstanbul saat dilimine göre ayarlama
+            morning_start_datetime = timezone.make_aware(morning_start_datetime, timezone.get_current_timezone())
 
             # Ofise geç kalma süresi
             if check_in_datetime > morning_start_datetime:
@@ -35,21 +31,21 @@ class Attendance(models.Model):
         # Ofiste geçen süreyi hesapla (ilk giriş ve son çıkış arasındaki süre)
         if self.check_in and self.check_out:
             check_in_datetime = datetime.combine(self.date, self.check_in)
-            check_in_datetime = make_aware(check_in_datetime, istanbul_tz)
+            check_in_datetime = timezone.make_aware(check_in_datetime, timezone.get_current_timezone())
 
             check_out_datetime = datetime.combine(self.date, self.check_out)
-            check_out_datetime = make_aware(check_out_datetime, istanbul_tz)
+            check_out_datetime = timezone.make_aware(check_out_datetime, timezone.get_current_timezone())
 
+            # Ofiste geçen süreyi hesapla
             duration = check_out_datetime - check_in_datetime
             # Sadece saat ve dakikayı tutmak için saniyeyi yuvarlama
-            duration = timedelta(hours=duration.seconds // 3600, minutes=(duration.seconds // 60) % 60)
-            self.office_duration = duration
+            self.office_duration = timedelta(hours=duration.seconds // 3600, minutes=(duration.seconds // 60) % 60)
 
-        # Eğer check_in var ama check_out yoksa, çıkış saati otomatik olarak gece 00:00 olarak ayarlanır(not planned yet)
+        # Eğer check_in var ama check_out yoksa, çıkış saati otomatik olarak akşam 18:00 olarak ayarlanır
         # if self.check_in and not self.check_out:
-        #     midnight = time(0, 0)  # Gece 00:00
-        #     check_out_datetime = datetime.combine(self.date + timedelta(days=1), midnight)
-        #     check_out_datetime = make_aware(check_out_datetime, istanbul_tz)
+        #     evening_end = time(18, 0)  # Akşam 18:00
+        #     check_out_datetime = datetime.combine(self.date, evening_end)
+        #     check_out_datetime = timezone.make_aware(check_out_datetime, timezone.get_current_timezone())
         #     self.check_out = check_out_datetime.time()
 
         super().save(*args, **kwargs)
